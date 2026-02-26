@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, Request
 import psycopg2
 import os
@@ -24,11 +23,15 @@ def hello():
 
 @app.get("/users")
 def users():
-    conn=get_conn()
-    cur=conn.cursor()
-    cur.execute("SELECT * FROM users")
-    rows=cur.fetchall()
-    return {"data":rows}
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users")
+        rows = cur.fetchall()
+        cur.close()
+        return {"data": rows}
+    finally:
+        conn.close() # CRITICAL: Close the connection so it doesn't leak!
 
 @app.get("/xss")
 async def xss(q:str):
